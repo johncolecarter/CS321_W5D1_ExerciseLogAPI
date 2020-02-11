@@ -92,6 +92,12 @@ namespace CS321_W5D1_ExerciseLogAPI.Controllers
         {
             var activity = _activityService.Update(updatedActivity.ToDomainModel());
             if (activity == null) return NotFound();
+
+            if(activity.UserId != CurrentUserId && !User.IsInRole("Admin"))
+            {
+                ModelState.AddModelError("UserId", "You can only update your own activities.");
+                return BadRequest(ModelState);
+            }
             return Ok(activity.ToApiModel());
         }
 
@@ -101,6 +107,13 @@ namespace CS321_W5D1_ExerciseLogAPI.Controllers
         {
             var activity = _activityService.Get(id);
             if (activity == null) return NotFound();
+
+            if(activity.UserId != CurrentUserId && !User.IsInRole("Admin"))
+            {
+                ModelState.AddModelError("UserId", "You can only delete your own activities.");
+                return BadRequest(ModelState);
+            }
+
             _activityService.Remove(activity);
             return NoContent();
         }
